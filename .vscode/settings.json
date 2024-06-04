@@ -1,2 +1,7 @@
 {
+    "mypy.runUsingActiveInterpreter":true,
+    "mypy.extraArguments": [
+        "--ignore-missing-imports"
+    ]
 }
+   

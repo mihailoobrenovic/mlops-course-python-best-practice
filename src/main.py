@@ -1,29 +1,31 @@
+from __future__ import annotations
+
 import os
+from pathlib import Path
 
 import torch
 from PIL import Image
 from torchvision import models, transforms
 from torchvision.models.resnet import ResNet18_Weights
-from pathlib import Path
 
 
 class ImageData:
-    def __init__(self, img_dir):
-        self.D = img_dir
+    def __init__(self, img_dir: str):  # noqa: ANN101, ANN204
+        self.d = img_dir
 
-    def load_images(self):
+    def load_images(self) -> list[Image.Image]:  # noqa: ANN101
         return [
-            Image.open(Path(self.D) / f)
-            for f in os.listdir(self.D)
+            Image.open(Path(self.d) / f)
+            for f in os.listdir(self.d)
             if f.endswith((".jpg", ".png"))
         ]
 
 
 class ImgProcess:
-    def __init__(self, size):
+    def __init__(self, size: int):  # noqa: D107, ANN204, ANN101
         self.s = size
 
-    def resize_and_gray(self, img_list):
+    def resize_and_gray(self, img_list: list[Image.Image]) -> list:  # noqa: ANN101
         p_images = []
         for img in img_list:
             t = transforms.Compose(
@@ -50,12 +52,12 @@ class Predictor:
         self.mdl = models.resnet18(weights=ResNet18_Weights.DEFAULT)
         self.mdl.eval()
 
-    def predict_img(self, processed_images):
-        results = []
-        for img_tensor in processed_images:
-            pred = self.mdl(img_tensor.unsqueeze(0))
-            results.append(torch.argmax(pred, dim=1).item())
-        return results
+    def predict_img(self, proc_imgs: list) -> list:
+        res = []
+        for img_tensor in proc_imgs:
+            predictions = self.mdl(img_tensor.unsqueeze(0))
+            res.append(torch.argmax(predictions, dim=1).item())
+        return res
 
 
 if __name__ == "__main__":
